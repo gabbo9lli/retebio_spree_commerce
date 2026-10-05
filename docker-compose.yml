@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: retebio_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: retebio_development
+    volumes:
+      - retebio_pgdata:/var/lib/postgresql/data
+      - ../:/dumps:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - retebio_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: retebio_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - retebio_redisdata:/data
+    networks:
+      - retebio_net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: retebio_backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0 -p 4000"
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./backend:/rails
+      - backend_bundle_cache:/usr/local/bundle
+      - ./backend/storage:/rails/storage
+      - ../:/dumps:ro
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_PORT: 5432
+      REDIS_URL: redis://redis:6379/0
+      RAILS_ENV: development
+    networks:
+      - retebio_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.development
+    container_name: retebio_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    environment:
+      - BACKEND_URL=http://backend:4000
+      - ASSETS_URL=http://localhost:4000
+    volumes:
+      - ./frontend:/app
+    networks:
+      - retebio_net
+
+volumes:
+  retebio_pgdata:
+  retebio_redisdata:
+  backend_bundle_cache:
+
+networks:
+  retebio_net:
+    name: retebio_net

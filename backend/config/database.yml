@@ -1,0 +1,26 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development: &development
+  <<: *default
+  database: retebio_development
+  host: <%= ENV.fetch('DB_HOST', 'postgres') %>
+  username: <%= ENV.fetch('DB_USER', 'postgres') %>
+  password: <%= ENV.fetch('DB_PASSWORD', 'password') %>
+  port: <%= ENV.fetch('DB_PORT', 5432) %>
+  gssencmode: disable
+
+test:
+  <<: *default
+  database: retebio_test
+  host: <%= ENV.fetch('DB_HOST', 'postgres') %>
+  username: <%= ENV.fetch('DB_USER', 'postgres') %>
+  password: <%= ENV.fetch('DB_PASSWORD', 'password') %>
+  port: <%= ENV.fetch('DB_PORT', 5432) %>
+  gssencmode: disable
+
+production:
+  <<: *default
+  url: <%= ENV['DATABASE_URL'] %>

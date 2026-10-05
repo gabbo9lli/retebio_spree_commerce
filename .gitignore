@@ -1,0 +1,33 @@
+# Retebio Monorepo Git Ignore
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Backend (Rails)
+backend/.bundle
+backend/log/*
+backend/tmp/*
+!backend/log/.keep
+!backend/tmp/.keep
+backend/tmp/pids/*
+!backend/tmp/pids/
+!backend/tmp/pids/.keep
+backend/storage/*
+!backend/storage/.keep
+backend/public/assets
+backend/config/master.key
+
+# Frontend (Node / Nuxt / Vue Storefront)
+frontend/node_modules/
+frontend/packages/*/node_modules/
+frontend/.nuxt/
+frontend/packages/*/.nuxt/
+frontend/packages/*/dist/
+frontend/packages/*/lib/
+frontend/.cache/

@@ -1,0 +1,8 @@
+# Reverse Proxy configuration with automatic Let's Encrypt SSL
+{$STORE_DOMAIN:store.retebio.it} {
+    reverse_proxy frontend:3000
+}
+
+{$API_DOMAIN:api.retebio.it} {
+    reverse_proxy backend:4000
+}

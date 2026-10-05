@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.development
+    container_name: retebio_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - BACKEND_URL=http://retebio_spree_backend:4000
+    volumes:
+      - .:/app
+    networks:
+      - default
+
+networks:
+  default:
+    name: retebio_net
+    external: true
