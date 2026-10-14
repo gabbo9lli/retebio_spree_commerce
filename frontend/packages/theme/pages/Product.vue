@@ -65,21 +65,71 @@
               @click="updateFilter({ color: color.value })"
             />
           </div>
-          <SfAddToCart
-            v-if="isAuthenticated"
-            v-e2e="'product_add-to-cart'"
-            v-model="qty"
-            :disabled="loading || !isInStock"
-            class="product__add-to-cart"
-            @click="addItem({ product, quantity: parseInt(qty) })"
-          />
-          <SfButton
-            v-else
-            class="sf-button--full-width color-primary mt-4 py-3"
-            @click="toggleLoginModal"
-          >
-            Accedi per acquistare
-          </SfButton>
+          <div v-if="product" class="product__order-box my-3 p-3 rounded" style="background-color: #f9fbf9; border: 1px solid #c8e6c9; border-radius: 8px; padding: 16px;">
+            <div class="product__package-badge mb-3 d-flex align-items-center justify-content-between" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span style="font-weight: 700; color: #2e7d32; font-size: 1.05rem;">
+                📦 Confezione: Cassa da {{ packageWeight }} kg
+              </span>
+              <span class="text-muted" style="font-size: 0.85rem; color: #666;">
+                Unità minima: 1 collo
+              </span>
+            </div>
+
+            <div class="product__colli-selector d-flex align-items-center mb-3" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+              <span style="font-weight: 600; font-size: 0.95rem; color: #333;">Numero colli:</span>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <button
+                  type="button"
+                  class="sf-button sf-button--outline"
+                  style="width: 36px; height: 36px; padding: 0; font-weight: bold; border-radius: 4px;"
+                  :disabled="colli <= 1"
+                  @click="decrementColli"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  min="1"
+                  v-model.number="colli"
+                  style="width: 60px; height: 36px; text-align: center; font-weight: 700; border: 1px solid #ccc; border-radius: 4px;"
+                />
+                <button
+                  type="button"
+                  class="sf-button sf-button--outline"
+                  style="width: 36px; height: 36px; padding: 0; font-weight: bold; border-radius: 4px;"
+                  @click="incrementColli"
+                >
+                  +
+                </button>
+              </div>
+              <span style="font-weight: 700; color: #1b5e20; font-size: 1rem;">
+                = {{ totalWeightKg }} kg totali
+              </span>
+            </div>
+
+            <SfButton
+              v-if="isAuthenticated"
+              class="sf-button--full-width color-primary py-3"
+              style="width: 100%; font-weight: 700; font-size: 1.05rem;"
+              :disabled="loading || !isInStock"
+              @click="handleAddToCart"
+            >
+              <span v-if="isInStock">
+                Aggiungi al carrello ({{ colli }} {{ colli === 1 ? 'collo' : 'colli' }} - {{ totalWeightKg }} kg)
+              </span>
+              <span v-else>
+                Prodotto al momento non disponibile
+              </span>
+            </SfButton>
+            <SfButton
+              v-else
+              class="sf-button--full-width color-primary py-3"
+              style="width: 100%; font-weight: 700; font-size: 1.05rem;"
+              @click="toggleLoginModal"
+            >
+              Accedi per acquistare
+            </SfButton>
+          </div>
         </div>
 
         <LazyHydrate when-idle>
@@ -158,8 +208,9 @@ export default {
   transition: 'fade',
   setup() {
     const qty = ref(1);
+    const colli = ref(1);
     const { isAuthenticated } = useUser();
-    const { toggleLoginModal } = useUiState();
+    const { toggleLoginModal, toggleCartSidebar } = useUiState();
     const route = useRoute();
     const router = useRouter();
     const context = useContext();
@@ -175,8 +226,47 @@ export default {
     const categories = computed(() => productGetters.getCategoryIds(product.value));
     const properties = computed(() => productGetters.getProperties(product.value));
     const breadcrumbs = computed(() => productGetters.getBreadcrumbs(product.value).map(e => ({...e, link: context.localePath(e.link)})));
-    const isInStock = computed(() => productGetters.getInStock(product.value));
+    const isInStock = computed(() => {
+      if (!product.value) return false;
+      return productGetters.getInStock(product.value);
+    });
     const productGallery = computed(() => productGetters.getGallery(product.value));
+
+    const packageWeight = computed(() => {
+      if (!product.value) return 1;
+      const props = productGetters.getProperties(product.value) || [];
+      const pesoProp = props.find(p => p.name && (p.name.toLowerCase().includes('peso') || p.name.toLowerCase().includes('cassetta')));
+      if (pesoProp && parseFloat(pesoProp.value) > 0) {
+        return parseFloat(pesoProp.value);
+      }
+      return 1;
+    });
+
+    const totalWeightKg = computed(() => {
+      const tot = colli.value * packageWeight.value;
+      return Number.isInteger(tot) ? tot.toString() : tot.toFixed(1);
+    });
+
+    const calculatedQty = computed(() => {
+      return Math.round(colli.value * packageWeight.value);
+    });
+
+    const incrementColli = () => {
+      colli.value++;
+    };
+
+    const decrementColli = () => {
+      if (colli.value > 1) colli.value--;
+    };
+
+    const handleAddToCart = async () => {
+      try {
+        await addItem({ product: product.value, quantity: calculatedQty.value });
+        toggleCartSidebar();
+      } catch (e) {
+        console.error('Errore durante aggiunta al carrello:', e);
+      }
+    };
 
     onSSR(async () => {
       await search({ slug });
@@ -211,6 +301,12 @@ export default {
       relatedLoading,
       options,
       qty,
+      colli,
+      packageWeight,
+      totalWeightKg,
+      incrementColli,
+      decrementColli,
+      handleAddToCart,
       addItem,
       loading,
       productGetters,

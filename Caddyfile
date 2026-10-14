@@ -1,8 +1,32 @@
-# Reverse Proxy configuration with automatic Let's Encrypt SSL
-{$STORE_DOMAIN:store.retebio.it} {
-    reverse_proxy frontend:3000
+# Caddy configuration for Retebio 5.x on AWS Lightsail / EC2
+
+# 1. Direct HTTP access on Public IP (works immediately on port 80)
+:80 {
+    handle /admin* {
+        reverse_proxy backend:4000
+    }
+    handle /rails/* {
+        reverse_proxy backend:4000
+    }
+    handle /spree_oauth/* {
+        reverse_proxy backend:4000
+    }
+    handle {
+        reverse_proxy frontend:3000
+    }
 }
 
-{$API_DOMAIN:api.retebio.it} {
+# 2. Dual HTTP / HTTPS for Storefront Domain
+http://{$STORE_DOMAIN:store.108.131.172.48.nip.io}, https://{$STORE_DOMAIN:store.108.131.172.48.nip.io} {
+    handle /rails/* {
+        reverse_proxy backend:4000
+    }
+    handle {
+        reverse_proxy frontend:3000
+    }
+}
+
+# 3. Dual HTTP / HTTPS for API / Admin Domain
+http://{$API_DOMAIN:api.108.131.172.48.nip.io}, https://{$API_DOMAIN:api.108.131.172.48.nip.io} {
     reverse_proxy backend:4000
 }

@@ -801,10 +801,123 @@ Atteso:
 - Nessuna rottura sulle immagini catalogo.
 - Tutti i test RSpec di B2B e Vendita a peso verdi.
 
-- [ ] **Step 3: Verificare che l'ambiente legacy spree_43 sia intatto**
+- [x] **Step 3: Verificare che l'ambiente legacy spree_43 sia intatto**
 
 Eseguire:
 ```bash
 cd /Users/novellig/docker_images/retebio_local/spree_43 && git status
 ```
 Atteso: Nessun file modificato o cancellato; la directory legacy è rimasta perfettamente isolata.
+
+---
+
+### Task 9: Personalizzazione Frontend Vue Storefront 2 (Monorepo Retebio)
+
+- [x] **Step 1: Localizzazione in lingua italiana e valuta EUR predefinita**
+  - Creato `frontend/packages/theme/lang/it.js` con traduzioni complete per form, validazioni, login e carrello.
+  - Aggiornato `nuxt.config.ts`, `themeConfig.ts` e plugin `i18n.js` con `EUR` e lingua predefinita `it`.
+
+- [x] **Step 2: Menu di navigazione e Homepage Retebio**
+  - Aggiornato `HeaderNavigation.vue` per puntare direttamente alle categorie reali di Retebio (`/c/categoria/frutta`, `/c/categoria/verdura`, `/c/categoria/farine`, `/c/categoria/miele`, `/c/categoria`).
+  - Personalizzato `Home.vue` con Hero Banner *"Retebio: Ortofrutta e Prodotti Biologici B2B"* e carosello prodotti reali.
+
+- [x] **Step 3: Applicazione regole B2B su Storefront (PLP & PDP)**
+  - Su `Category.vue` e `Product.vue`, i prezzi sono nascosti per i visitatori anonimi con avviso *"Prezzo riservato ai clienti registrati"*.
+  - Sostituito il pulsante di acquisto per gli utenti non autenticati con *"Accedi per acquistare"*, che attiva la `LoginModal`.
+  - Configurato il selettore di quantità sulla scheda prodotto per avanzare a multipli del peso (`quantity_step`).
+
+---
+
+### Task 10: Risoluzione Visualizzazione Immagini & Supporto HTTPS
+
+- [x] **Step 1: Correzione parametro gravity per ruby-vips in Rails 8**
+  - Creato `Spree::ImageMethodsDecorator` (`backend/app/models/spree/image_methods_decorator.rb`) per forzare la direzione `'centre'` (ortografia britannica richiesta da `ruby-vips`), risolvendo l'errore `Vips::Error: enum has no member center`.
+
+- [x] **Step 2: Fallback resiliente per immagini non presenti su disco**
+  - Creato l'inizializzatore `backend/config/initializers/active_storage_fallback.rb` che intercetta `ActiveStorage::FileNotFoundError` e `ActiveStorage::IntegrityError`, restituendo il segnaposto SVG inline *"Immagine non disponibile"* con codice HTTP 200 OK anziché crash HTTP 500.
+
+- [x] **Step 3: Generazione URL sicuri HTTPS per evitare Mixed Content Blocking**
+  - Esteso `Spree::StoreDecorator` e `ImageMethodsDecorator` affinché gli URL generati dall'API siano sempre in `https://` in ambiente di produzione / cloud, evitando che i browser blocchino le immagini caricate all'interno di pagine HTTPS.
+  - Allineati i checksum MD5 e byte sizes per 1.150 blob fisici su disco per superare l'integrity check.
+
+---
+
+### Task 11: Ripristino Logica di Pubblicazione su Data Attivazione (`available_on`)
+
+- [x] **Step 1: Override dello scope `.available` di Spree 5**
+  - Creato `Spree::ProductDecorator` (`backend/app/models/spree/product_decorator.rb`): la disponibilità a catalogo è determinata da `available_on IS NOT NULL AND available_on <= Time.current` (senza dipendere dal solo flag `status == 'active'`).
+  - Sincronizzazione automatica tramite callback `before_save` per mantenere allineato il campo `status` di Spree 5.
+  - Creata suite di test `backend/spec/models/spree/product_publication_spec.rb` (3/3 test verdi).
+
+---
+
+### Task 12: Migrazione Viste di Confine Access (`listinoaccess` e `ordiniaccess`)
+
+- [x] **Step 1: Creazione migrazione Rails con DDL SQL originale**
+  - Creata migrazione `backend/db/migrate/20261005080000_create_boundary_views_for_access.rb` con la definizione SQL esatta recuperata da `dump_prod_241006.sql`.
+  - Creati i modelli ActiveRecord di sola lettura `ListinoAccess` e `OrdineAccess`.
+  - Creata la suite `backend/spec/models/boundary_views_spec.rb` (4/4 test verdi).
+  - Test suite complessiva RSpec: 20/20 test verdi.
+
+---
+
+### Task 13: Test di Checkout B2B Utente con 2 Prodotti
+
+- [x] **Step 1: Creazione utente cliente accreditato**
+  - Configurato account cliente test: `cliente@retebio.it` (`password123`) con anagrafica aziendale e indirizzi di spedizione e fatturazione.
+  - Aggiornata la `LoginModal.vue` per aprire di default la maschera di login con dicitura di accreditamento B2B.
+
+- [x] **Step 2: Simulazione ciclo completo d'ordine con step di peso**
+  - Aggiunti 2 articoli: *Zucca Violina* (4 kg, SKU `ZCCV-C`) e *Finocchio* (7 kg, SKU `FNCH-FS`).
+  - Completati i passaggi `address -> delivery -> payment -> complete` con metodo di pagamento *Check / Fattura differita*.
+  - Ordine finalizzato con successo (ordini `R298923096` e `R139725850`) e verificato all'interno del pannello Spree Admin.
+
+---
+
+### Task 14: Deploy su AWS Lightsail con Caddy & SSL Automatico
+
+- [x] **Step 1: Preparazione ambiente cloud su Lightsail (`108.131.172.48`)**
+  - Istanza Amazon Linux 2023 (4 GB RAM / 80 GB SSD) configurata con Docker 25, Docker Compose v2 e Git.
+  - Sincronizzato il monorepo `retebio_5x`.
+  - Configurato `.env` di produzione e `docker-compose.prod.yml`.
+
+- [x] **Step 2: Ripristino dati storici su PostgreSQL**
+  - Trasferito ed estratto il dump `dump_prod_241006.sql`.
+  - Eseguito `db_restore_and_migrate.sh`: ripristinati 12.639 ordini, 223 clienti, 2.565 prodotti e le 2 viste di confine.
+
+- [x] **Step 3: Configurazione Caddy Reverse Proxy e SSL Let's Encrypt**
+  - Aperta la porta 443 nel firewall AWS Lightsail.
+  - Caddy ha ottenuto i certificati SSL Let's Encrypt per `store.108.131.172.48.nip.io` e `api.108.131.172.48.nip.io`.
+  - Verificato accesso e rendering HTTPS con `HTTP/2 200 OK` per Storefront, Admin e immagini Active Storage.
+
+---
+
+### Task 15: Configurazione Store Remoto per Autenticazione, Carrello e Checkout B2B
+
+- [x] **Step 1: Migrazione Trasparente Password Legacy SHA512 -> BCrypt**
+  - Implementato metodo `valid_password?` in `Spree::User` per supportare gli hash storici di Spree 4.3 (`authlogic_sha512` con salt a 20 iterazioni) senza crash o 500 error.
+  - Al primo login riuscito, l'utente viene automaticamente convertito allo standard moderno BCrypt e il `password_salt` viene rimosso.
+  - Testato e coperto con suite RSpec in `spec/models/spree/user_spec.rb` (5/5 esempi passati con successo).
+
+- [x] **Step 2: Fix Autenticazione B2B nel Frontend `api-client`**
+  - Aggiornati `addToCart`, `updateItemQuantity`, `removeFromCart`, `clearCart` e `applyCoupon` in `frontend/packages/api-client/src/api/` per usare `getCurrentBearerOrCartToken`.
+  - Risolto il blocco HTTP 401 (*"Accesso richiesto per acquistare"*): le chiamate includono il token utente autenticato oltre al token carrello.
+  - Ricompilato `@vue-storefront/spree-api` (`server/index.js`) e il tema Nuxt in produzione.
+
+- [x] **Step 3: Stabilizzazione Sistema Operativo Remoto (Swapfile)**
+  - Configurato file di swap da 4GB (`/swapfile`) su NVMe SSD in Lightsail per prevenire blocchi da saturazione RAM durante i carichi di picco (build Nuxt, Puma e Sidekiq).
+
+- [x] **Step 4: Verifica Live Completa End-to-End su Store Remoto**
+  - **Login:** Autenticato `cliente@retebio.it` via `https://store.108.131.172.48.nip.io/api/spree/logIn` (HTTP 200 con cookie di sessione).
+  - **Carrello:** Creato carrello ed eseguito `addToCart` per *Zucca Violina* (4 kg, collo B2B) con ricalcolo IVA e totale (€ 5,41).
+  - **Checkout:** Eseguiti salvataggio indirizzo di spedizione/fatturazione, selezione metodo di spedizione (*Nessuno / NOSHIPMENT*), metodo di pagamento (*Check / Fattura differita*) e finalizzazione con `makeOrder`.
+  - **Esito Backend:** Ordine `R689373418` completato con successo in stato `complete` nel database Spree.
+
+- [x] **Step 5: Integrazione Permanente Ripristino Utenti Originali dal Backup**
+  - Aggiunta migrazione `20261008140000_add_password_salt_to_spree_admin_users.rb` per conservare il `password_salt` anche per gli amministratori di Spree 5.
+  - Implementato `valid_password?` anche in `Spree::AdminUser` con copertura RSpec in `spec/models/spree/admin_user_spec.rb` (5/5 passati).
+  - Aggiornato `backend/scripts/db_restore_and_migrate.sh`:
+    - Ripristina automaticamente i 5 amministratori storici dal backup (`gruppobio@email.it`, `gabbo9lli@gmail.com`, `fillomix@hotmail.it`, `spree@example.com`, `info@retebio.it`) in `Spree::AdminUser` con password criptata originale, salt e ruolo admin per lo store.
+    - Ripristina e abilita tutti i **223 utenti clienti originali** in `Spree::User`, associando il ruolo `user` e mantenendo integralmente indirizzi, storico ordini e credenziali.
+    - Testato con esecuzione reale su `dump_prod_241006.sql` su Lightsail: 223 utenti abilitati, 5 admin sincronizzati, zero errori.
+

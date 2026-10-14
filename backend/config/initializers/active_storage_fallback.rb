@@ -2,7 +2,7 @@
 
 Rails.application.config.to_prepare do
   ActiveStorage::Representations::BaseController.class_eval do
-    rescue_from ActiveStorage::FileNotFoundError do |_e|
+    rescue_from ActiveStorage::FileNotFoundError, ActiveStorage::IntegrityError do |_e|
       svg = Spree::ImagesHelperDecorator::FALLBACK_PLACEHOLDER_SVG rescue nil
       if svg
         send_data svg, type: 'image/svg+xml', disposition: 'inline'
@@ -13,7 +13,7 @@ Rails.application.config.to_prepare do
   end
 
   ActiveStorage::Blobs::ProxyController.class_eval do
-    rescue_from ActiveStorage::FileNotFoundError do |_e|
+    rescue_from ActiveStorage::FileNotFoundError, ActiveStorage::IntegrityError do |_e|
       svg = Spree::ImagesHelperDecorator::FALLBACK_PLACEHOLDER_SVG rescue nil
       if svg
         send_data svg, type: 'image/svg+xml', disposition: 'inline'

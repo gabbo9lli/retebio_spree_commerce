@@ -18,6 +18,10 @@ services:
       - backend
       - frontend
 
+  postgres:
+    environment:
+      POSTGRES_DB: retebio_production
+
   backend:
     build:
       context: ./backend
@@ -34,16 +38,25 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_REGION:-eu-central-1}
-      AWS_BUCKET: ${AWS_BUCKET:-retebio-media-prod}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-${AWS_BUCKET:-retebio-media-prod}}
+      AWS_BUCKET: ${AWS_S3_BUCKET:-${AWS_BUCKET:-retebio-media-prod}}
+      API_DOMAIN: ${API_DOMAIN:-api.108.131.172.48.nip.io}
+      SPREE_STORE_URL: ${SPREE_STORE_URL:-${API_DOMAIN:-api.108.131.172.48.nip.io}}
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    container_name: retebio_frontend
+    command: ./docker-entrypoint.sh
     ports: []
     environment:
       NODE_ENV: production
+      NODE_OPTIONS: --max-old-space-size=2048
       BACKEND_URL: http://backend:4000
+      ASSETS_URL: https://${API_DOMAIN:-api.108.131.172.48.nip.io}
+      BASE_URL: https://${STORE_DOMAIN:-store.108.131.172.48.nip.io}
+      STORE_DOMAIN: ${STORE_DOMAIN:-store.108.131.172.48.nip.io}
 
 volumes:
   caddy_data:

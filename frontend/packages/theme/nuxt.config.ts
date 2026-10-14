@@ -9,7 +9,7 @@ dotenv.config({ path: `./../../.env.${process.env.NODE_ENV}` });
 const serverConfig = {
   port: process.env.PORT || 3000,
   host: process.env.HOST || '0.0.0.0',
-  baseUrl: process.env.BASE_URL || 'http://localhost:3000'
+  baseUrl: process.env.BASE_URL || (process.env.STORE_DOMAIN ? `https://${process.env.STORE_DOMAIN}` : 'http://localhost:3000')
 };
 
 export default {

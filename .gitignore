@@ -5,6 +5,11 @@
 .env.*
 !.env.example
 
+# Database dumps
+*.sql
+*.sql.zip
+*.sql.gz
+
 # OS Files
 .DS_Store
 Thumbs.db

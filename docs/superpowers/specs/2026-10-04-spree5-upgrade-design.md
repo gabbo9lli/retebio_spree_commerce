@@ -189,3 +189,29 @@ Lo script di migrazione eseguirà query di conteggio e controllo per garantire z
 - La directory `spree_43` esistente non viene mai modificata né rimossa.
 - I file di dump SQL di produzione rimangono protetti in sola lettura.
 - In caso di esito negativo o necessità di ripartenza da zero, il database PostgreSQL containerizzato può essere azzerato e ricaricato tramite `scripts/db_restore_and_migrate.sh` in pochi minuti.
+
+---
+
+## 8. Integrazione con Sistemi Esterni: Viste di Confine Access
+
+Per garantire continuità operativa con software di terze parti (Microsoft Access, gestionali ERP, script di estrazione), il database PostgreSQL espone 2 viste storiche native:
+
+1. **`public.listinoaccess`**:
+   - Dati esportati: codice articolo, SKU (codice_access), denominazione, descrizione, prezzo, produttore aggregato da `spree_product_properties`, unità di misura (um), classe IVA, date di disponibilità (`available_on` / `discontinue_on`), prezzo di acquisto e timestamp di aggiornamento.
+   - Filtro: varianti non cancellate (`v.deleted_at IS NULL`) e articoli all'interno del periodo di disponibilità valido.
+2. **`public.ordiniaccess`**:
+   - Dati esportati: ID ordine, numero d'ordine, totale, stato, ID utente cliente, email, timestamp di completamento, prezzo unitario, quantità ordinata, codice articolo, SKU, nome articolo, descrizione, produttore aggregato, unità di misura e classe IVA.
+   - Filtro: ordini completati (`state = 'complete'`).
+
+Le viste sono formalmente versionate in Rails tramite la migrazione `backend/db/migrate/20261005080000_create_boundary_views_for_access.rb` e mappate sui modelli ActiveRecord `ListinoAccess` e `OrdineAccess` con flag `readonly? = true`.
+
+---
+
+## 9. Architettura Cloud di Produzione su AWS Lightsail
+
+- **Infrastruttura:** Istanza AWS Lightsail Linux (Amazon Linux 2023, 4 GB RAM, 80 GB NVMe SSD).
+- **Reverse Proxy & SSL:** Container Caddy (porte 80 e 443) con emissione automatica e rinnovo continuo dei certificati SSL gratuiti Let's Encrypt.
+- **Risoluzione Nomi:** Wildcard DNS `nip.io` per ambiente di test (`store.108.131.172.48.nip.io` e `api.108.131.172.48.nip.io`), con switch immediato a domini personalizzati di produzione (`store.retebio.it`, `api.retebio.it`).
+- **Resilienza Media:** Active Storage su disco locale Lightsail con compatibilità `ruby-vips` ('centre') e fallback dinamico su placeholder SVG per file mancanti, con predisposizione per Amazon S3 (`aws-sdk-s3`).
+- **Automazione:** Script `scripts/deploy_aws.sh` e `scripts/db_restore_and_migrate.sh` per ripristini e deployment completi da zero.
+

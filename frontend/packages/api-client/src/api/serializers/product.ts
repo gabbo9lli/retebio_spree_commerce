@@ -153,7 +153,7 @@ const partialDeserializeProductVariant = (
     original: variant.attributes.price,
     current: variant.attributes.price
   },
-  inStock: variant.attributes.in_stock
+  inStock: Boolean(variant.attributes.purchasable ?? (variant.attributes.in_stock || variant.attributes.backorderable))
 });
 
 const maybePrimaryVariantId = (product: ProductAttr): RelationType['id'] | undefined =>
@@ -231,23 +231,33 @@ export const deserializeLimitedVariants = (apiProducts: IProducts): ProductVaria
   });
 };
 
-const addHostToImage = (image, config: ApiConfig) => ({
-  ...image,
-  attributes: {
-    ...image.attributes,
-    styles: image.attributes?.styles ? image.attributes.styles.map((style) => {
-      const host = style.url.startsWith('http://') || style.url.startsWith('https://')
-        ? ''
-        : (config.assetsUrl || config.backendUrl);
+const addHostToImage = (image: JsonApiDocument, config: ApiConfig) => {
+  const assetsHost = config.assetsUrl || (config.backendUrl?.startsWith('http://backend') ? '' : config.backendUrl);
 
-      return {
-        width: style.width,
-        height: style.height,
-        url: `${host}${style.url}`
-      };
-    }) : []
-  }
-});
+  return {
+    ...image,
+    attributes: {
+      ...image.attributes,
+      styles: image.attributes?.styles ? image.attributes.styles.map((style) => {
+        let finalUrl = style.url || '';
+
+        if (finalUrl.startsWith('http://') || finalUrl.startsWith('https://')) {
+          if (assetsHost && /(localhost|backend|127\.0\.0\.1|\d+\.\d+\.\d+\.\d+)(:\d+)?/.test(finalUrl)) {
+            finalUrl = finalUrl.replace(/^https?:\/\/[^/]+/, assetsHost);
+          }
+        } else if (assetsHost) {
+          finalUrl = `${assetsHost}${finalUrl}`;
+        }
+
+        return {
+          width: style.width,
+          height: style.height,
+          url: finalUrl
+        };
+      }) : []
+    }
+  };
+};
 
 const addHostToIncluded = (included: JsonApiDocument[], config: ApiConfig) =>
   included.map((e) =>

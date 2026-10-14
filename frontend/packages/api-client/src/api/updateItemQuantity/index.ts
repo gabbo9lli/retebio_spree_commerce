@@ -1,7 +1,9 @@
 import { Logger } from '@vue-storefront/core';
+import type { RequiredAnyToken } from '@spree/storefront-api-v2-sdk';
 import { ApiContext, Cart, UpdateItemQuantityParams } from '../../types';
 import { cartParams } from '../common/cart';
 import { deserializeCart } from '../serializers/cart';
+import getCurrentBearerOrCartToken from '../authentication/getCurrentBearerOrCartToken';
 
 export default async function updateItemQuantity(
   { client, config }: ApiContext,
@@ -10,10 +12,11 @@ export default async function updateItemQuantity(
   try {
     config.auth.changeCartToken(token);
     const currency = await config.internationalization.getCurrency();
+    const currentToken = await getCurrentBearerOrCartToken({ client, config }) as RequiredAnyToken;
 
     const result = await client.cart.setQuantity(
       {
-        order_token: token,
+        ...currentToken,
         line_item_id: lineItemId,
         quantity,
         currency,
