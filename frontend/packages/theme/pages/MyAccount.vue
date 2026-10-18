@@ -5,6 +5,7 @@
       :breadcrumbs="breadcrumbs"
     />
     <SfTabs
+      v-if="!isSubPage"
       :openTab="1"
       tabShowText="show"
       tabHideText="hide"
@@ -25,6 +26,9 @@
         @click="handleLogout"
       />
     </SfTabs>
+    <div v-else class="smartphone-only my-account__subpage">
+      <NuxtChild />
+    </div>
 
     <div class="my-account desktop-only">
       <div class="my-account__sidebar">
@@ -45,7 +49,9 @@
 <script>
 import { SfBreadcrumbs, SfContentPages, SfTabs, SfMenuItem } from '@storefront-ui/vue';
 import {
-  useRouter
+  useRouter,
+  useRoute,
+  computed
 } from '@nuxtjs/composition-api';
 import { useUser } from '@vue-storefront/spree';
 import MyProfile from './MyAccount/MyProfile';
@@ -68,14 +74,17 @@ export default {
   middleware: ['is-authenticated', 'my-profile'],
   setup(props, context) {
     const router = useRouter();
+    const route = useRoute();
     const { logout } = useUser();
+
+    const isSubPage = computed(() => Boolean(route?.value?.path?.includes('/order-details')));
 
     const handleLogout = async () => {
       await logout();
       router.replace(context.root.localePath({ name: 'home' }));
     };
 
-    return { handleLogout };
+    return { handleLogout, isSubPage };
   },
 
   data(root) {
@@ -139,6 +148,9 @@ export default {
   &__view {
     width: calc(100% - var(--sidebar-width));
     padding: 2rem;
+  }
+  &__subpage {
+    padding: 1rem;
   }
   &__logout {
     cursor: pointer;

@@ -64,8 +64,6 @@ export default {
         make_an_order: 'Make an order',
         table_headers: [
           { key: 'description', value: 'Description' },
-          { key: 'size', value: 'Size' },
-          { key: 'color', value: 'Color' },
           { key: 'quantity', value: 'Quantity' },
           { key: 'amount', value: 'Amount' }
         ]
@@ -141,6 +139,9 @@ export default {
         table_header_order_id: 'Order id',
         table_header_payment_date: 'Payment date',
         table_header_status: 'Status',
+        table_header_subtotal: 'Subtotal (excl. VAT)',
+        table_header_tax: 'VAT',
+        table_header_shipping: 'Shipping',
         table_header_total: 'Total',
         button_show_all_orders_label: 'Show all orders',
         products_table_headers: [
@@ -197,7 +198,8 @@ export default {
       cart_preview: {
         order_summary: 'Order summary',
         products: 'Products',
-        subtotal: 'Subtotal',
+        subtotal: 'Subtotal (excl. VAT)',
+        tax: 'VAT',
         shipping: 'Shipping',
         total: 'Total',
         enter_promo_code: 'Enter promo code',
@@ -265,37 +267,38 @@ export default {
       about_us: {
         title: 'About us',
         items: [
-          'Who we are',
-          'Quality in the details',
-          'Customer Reviews'
+          'La Rete Bio',
+          'Quality & Territory',
+          'Organic farming'
         ]
       },
       departments: {
-        title: 'Departments',
+        title: 'Our products',
         items: [
-          'Women fashion',
-          'Men fashion',
-          'Kidswear',
-          'Home'
+          'Organic fruit',
+          'Organic vegetables',
+          'Flours and grains',
+          'Legumes and seeds',
+          'Honey and preserves',
+          'Oil and vinegar'
         ]
       },
       help: {
-        title: 'Help',
+        title: 'Help & Support',
         items: [
           'Customer service',
-          'Size guide',
           'Contact us'
         ]
       },
       payment_and_delivery: {
         title: 'Payment & Delivery',
         items: [
-          'Purchase terms',
-          'Guarantee'
+          'Sales terms',
+          'Direct delivery'
         ]
       },
       social: {
-        title: 'Social',
+        title: 'Follow us',
         items: [
           'facebook',
           'pinterest',
@@ -331,7 +334,9 @@ export default {
       total_items: 'Total items',
       your_cart_is_empty_title: 'Your cart is empty',
       your_cart_is_empty_description: 'Looks like you haven’t added any items to the bag yet. Start shopping to fill it in.',
-      subtotal_price: 'Subtotal price'
+      subtotal_price: 'Subtotal (excl. VAT)',
+      tax_price: 'VAT',
+      total_price: 'Total'
     },
     category_page_header: {
       filters: 'Filters',

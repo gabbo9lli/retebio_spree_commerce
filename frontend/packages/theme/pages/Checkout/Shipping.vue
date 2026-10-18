@@ -376,6 +376,9 @@ export default {
       if (checkoutShippingAddress.value && savedAddresses.value?.addresses && savedAddresses.value?.addresses?.length) {
         selectedSavedAddressId.value = savedAddresses.value.addresses.find(e => isEqualAddress(e, checkoutShippingAddress.value))?._id;
       }
+      if (!selectedSavedAddressId.value && savedAddresses.value?.addresses?.length) {
+        selectedSavedAddressId.value = savedAddresses.value.addresses[0]._id;
+      }
     };
 
     const routeToBillingOrPayment = () => {

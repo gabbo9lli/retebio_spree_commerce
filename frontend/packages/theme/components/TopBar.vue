@@ -1,37 +1,11 @@
 <template>
-  <SfTopBar class="topbar">
-    <template #left>
-      <SfButton class="sf-button--text">{{ $t('components.top_bar.help_and_faqs') }}</SfButton>
-    </template>
-    <template #center>
-      <p>{{ $t('components.top_bar.download') }}</p>
-      <SfButton class="topbar__button sf-button--text">{{ $t('components.top_bar.find_out_more') }}</SfButton>
-    </template>
-    <template #right>
-      <LocaleSelector />
-    </template>
-  </SfTopBar>
+  <div style="display: none;" />
 </template>
 
 <script>
-import { SfButton, SfTopBar } from '@storefront-ui/vue';
-import LocaleSelector from './LocaleSelector';
-
 export default {
-  components: {
-    SfTopBar,
-    SfButton,
-    LocaleSelector
-  }
+  name: 'TopBar'
 };
-
 </script>
 <style lang="scss" scoped>
-.topbar {
-  position: relative;
-  z-index: 2;
-  &__button {
-    margin: 0 0 0 var(--spacer-xs);
-  }
-}
 </style>

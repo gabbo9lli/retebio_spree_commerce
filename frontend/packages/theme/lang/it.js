@@ -63,11 +63,9 @@ export default {
         go_back: 'Go back',
         make_an_order: 'Make an order',
         table_headers: [
-          { key: 'description', value: 'Description' },
-          { key: 'size', value: 'Size' },
-          { key: 'color', value: 'Color' },
-          { key: 'quantity', value: 'Quantity' },
-          { key: 'amount', value: 'Amount' }
+          { key: 'description', value: 'Descrizione' },
+          { key: 'quantity', value: 'Quantità' },
+          { key: 'amount', value: 'Prezzo' }
         ]
       },
       shipping: {
@@ -137,16 +135,19 @@ export default {
         ]
       },
       order_details: {
-        tab_title: 'Order details - {orderId}',
-        table_header_order_id: 'Order id',
-        table_header_payment_date: 'Payment date',
-        table_header_status: 'Status',
-        table_header_total: 'Total',
-        button_show_all_orders_label: 'Show all orders',
+        tab_title: 'Dettagli ordine - {orderId}',
+        table_header_order_id: 'Numero ordine',
+        table_header_payment_date: 'Data ordine',
+        table_header_status: 'Stato',
+        table_header_subtotal: 'Imponibile merci',
+        table_header_tax: 'IVA',
+        table_header_shipping: 'Spedizione',
+        table_header_total: 'Totale ordine',
+        button_show_all_orders_label: 'Torna a tutti gli ordini',
         products_table_headers: [
-          { key: 'products_name', value: 'Name' },
-          { key: 'products_quantity', value: 'Quantity' },
-          { key: 'products_price', value: 'Price' }
+          { key: 'products_name', value: 'Prodotto' },
+          { key: 'products_quantity', value: 'Quantità' },
+          { key: 'products_price', value: 'Prezzo cad.' }
         ]
       },
       saved_addresses_details: {
@@ -195,13 +196,14 @@ export default {
   components: {
     checkout: {
       cart_preview: {
-        order_summary: 'Order summary',
-        products: 'Products',
-        subtotal: 'Subtotal',
-        shipping: 'Shipping',
-        total: 'Total',
-        enter_promo_code: 'Enter promo code',
-        apply: 'Apply',
+        order_summary: 'Riepilogo ordine',
+        products: 'Articoli',
+        subtotal: 'Imponibile merci',
+        tax: 'IVA',
+        shipping: 'Spedizione',
+        total: 'Totale ordine',
+        enter_promo_code: 'Inserisci codice promozionale',
+        apply: 'Applica',
         characteristics: [
           {
             key: 'characteristic-safety',
@@ -263,39 +265,40 @@ export default {
     },
     app_footer: {
       about_us: {
-        title: 'About us',
+        title: 'Chi siamo',
         items: [
-          'Who we are',
-          'Quality in the details',
-          'Customer Reviews'
+          'La Rete Bio',
+          'Qualità e territorio',
+          'Agricoltura biologica'
         ]
       },
       departments: {
-        title: 'Departments',
+        title: 'I nostri prodotti',
         items: [
-          'Women fashion',
-          'Men fashion',
-          'Kidswear',
-          'Home'
+          'Frutta biologica',
+          'Verdura biologica',
+          'Farine e cereali',
+          'Legumi e semi',
+          'Miele e conserve',
+          'Olio e aceto'
         ]
       },
       help: {
-        title: 'Help',
+        title: 'Assistenza',
         items: [
-          'Customer service',
-          'Size guide',
-          'Contact us'
+          'Servizio clienti',
+          'Contattaci'
         ]
       },
       payment_and_delivery: {
-        title: 'Payment & Delivery',
+        title: 'Spedizione e consegna',
         items: [
-          'Purchase terms',
-          'Guarantee'
+          'Condizioni di vendita',
+          'Consegna diretta'
         ]
       },
       social: {
-        title: 'Social',
+        title: 'Seguici',
         items: [
           'facebook',
           'pinterest',
@@ -324,14 +327,16 @@ export default {
       aria_label_add_to_cart: 'Aria label add to cart'
     },
     cart_sidebar: {
-      product_already_in_your_wishlist: 'Product already in your wishlist',
-      go_to_checkout: 'Go to checkout',
-      go_back_shopping: 'Go back shopping',
-      my_cart: 'My Cart',
-      total_items: 'Total items',
-      your_cart_is_empty_title: 'Your cart is empty',
-      your_cart_is_empty_description: 'Looks like you haven’t added any items to the bag yet. Start shopping to fill it in.',
-      subtotal_price: 'Subtotal price'
+      product_already_in_your_wishlist: 'Prodotto già nella tua lista desideri',
+      go_to_checkout: 'Procedi al checkout',
+      go_back_shopping: 'Continua lo shopping',
+      my_cart: 'Il mio Carrello',
+      total_items: 'Articoli totali',
+      your_cart_is_empty_title: 'Il tuo carrello è vuoto',
+      your_cart_is_empty_description: 'Non hai ancora aggiunto prodotti al carrello.',
+      subtotal_price: 'Imponibile merci',
+      tax_price: 'IVA',
+      total_price: 'Totale ordine'
     },
     category_page_header: {
       filters: 'Filters',

@@ -9,6 +9,8 @@ class Spree::User < Spree.base_class
   include Spree::UserMethods
   include Spree::UserPaymentSource
 
+  after_save :ensure_addresses_user_id
+
   def valid_password?(password)
     return false if encrypted_password.blank?
 
@@ -31,5 +33,16 @@ class Spree::User < Spree.base_class
     end
   rescue BCrypt::Errors::InvalidHash
     false
+  end
+
+  private
+
+  def ensure_addresses_user_id
+    if bill_address_id.present? && bill_address&.user_id != id
+      bill_address.update_column(:user_id, id)
+    end
+    if ship_address_id.present? && ship_address&.user_id != id
+      ship_address.update_column(:user_id, id)
+    end
   end
 end

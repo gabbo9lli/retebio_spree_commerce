@@ -19,9 +19,26 @@
           class="sf-property--full-width property"
         />
         <SfProperty
+          :name="$t('pages.my_account.order_details.table_header_subtotal')"
+          :value="$n(order.itemTotalAmount || 0, 'currency')"
+          class="sf-property--full-width property"
+        />
+        <SfProperty
+          v-if="order.taxTotalAmount"
+          :name="$t('pages.my_account.order_details.table_header_tax')"
+          :value="$n(order.taxTotalAmount, 'currency')"
+          class="sf-property--full-width property"
+        />
+        <SfProperty
+          v-if="order.shipTotalAmount"
+          :name="$t('pages.my_account.order_details.table_header_shipping')"
+          :value="$n(order.shipTotalAmount, 'currency')"
+          class="sf-property--full-width property"
+        />
+        <SfProperty
           :name="$t('pages.my_account.order_details.table_header_total')"
           :value="$n(orderGetters.getPrice(order), 'currency')"
-          class="sf-property--full-width property"
+          class="sf-property--full-width property sf-property--large"
         />
       </div>
       <SfTable class="products">
@@ -36,7 +53,7 @@
         </SfTableHeading>
         <SfTableRow v-for="(item, i) in orderGetters.getItems(order)" :key="i">
           <SfTableData class="products__name">
-            <nuxt-link :to="`/p/${orderGetters.getItemSku(item)}/${orderGetters.getItemSku(item)}`">
+            <nuxt-link :to="`/products/${orderGetters.getItemSlug(item) || orderGetters.getItemSku(item)}`">
               {{orderGetters.getItemName(item)}}
             </nuxt-link>
           </SfTableData>
@@ -55,7 +72,7 @@ import {
   SfButton,
   SfProperty
 } from '@storefront-ui/vue';
-import { computed, useRoute, useRouter } from '@nuxtjs/composition-api';
+import { computed, useRoute, useRouter, onMounted } from '@nuxtjs/composition-api';
 import { useUserOrder, orderGetters } from '@vue-storefront/spree';
 import { onSSR } from '@vue-storefront/core';
 
@@ -74,7 +91,13 @@ export default {
     const { orders, search } = useUserOrder();
     const orderId = route?.value?.params?.id;
 
-    const order = computed(() => orderId ? (orders.value || null) : null);
+    const order = computed(() => {
+      if (!orderId) return null;
+      if (Array.isArray(orders.value)) {
+        return orders.value.find(o => orderGetters.getId(o) === orderId) || null;
+      }
+      return orders.value || null;
+    });
 
     const displayOrderHistory = () => {
       const localeTransformedPath = context.root.localePath('/my-account/order-history');
@@ -82,6 +105,10 @@ export default {
     };
 
     onSSR(async () => {
+      if (orderId) await search({ orderId });
+    });
+
+    onMounted(async () => {
       if (orderId) await search({ orderId });
     });
 

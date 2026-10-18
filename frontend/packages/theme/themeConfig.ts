@@ -2,23 +2,16 @@ export default {
   defaultCurrency: 'EUR',
   home: {
     bannerA: {
-      link: '/c/categoria/frutta',
-      image: {
-        mobile: '/homepage/bannerB.webp',
-        desktop: '/homepage/bannerF.webp'
-      }
+      link: '/c/categoria/frutta'
     },
     bannerB: {
-      link: '/c/categoria/verdura',
-      image: '/homepage/bannerE.webp'
+      link: '/c/categoria/verdura'
     },
     bannerC: {
-      link: '/c/categoria/farine',
-      image: '/homepage/bannerC.webp'
+      link: '/c/categoria/farine'
     },
     bannerD: {
-      link: '/c/categoria/miele',
-      image: '/homepage/bannerG.webp'
+      link: '/c/categoria/miele'
     }
   }
 };

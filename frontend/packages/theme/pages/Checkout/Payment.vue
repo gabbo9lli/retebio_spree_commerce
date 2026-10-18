@@ -28,12 +28,6 @@
           <div class="product-title">{{ cartGetters.getItemName(product) }}</div>
           <div class="product-sku">{{ cartGetters.getItemSku(product) }}</div>
         </SfTableData>
-        <SfTableData
-          class="table__data" v-for="(value, key) in cartGetters.getItemAttributes(product, ['size', 'color'])"
-          :key="key"
-        >
-          {{ value }}
-        </SfTableData>
         <SfTableData class="table__data">{{ cartGetters.getItemQty(product) }}</SfTableData>
         <SfTableData class="table__data price">
           <SfPrice
@@ -48,8 +42,14 @@
       <div class="summary__group">
         <div class="summary__total">
           <SfProperty
-            name="Subtotal"
+            :name="$t('components.checkout.cart_preview.subtotal')"
             :value="$n(totals.special > 0 ? totals.special : totals.subtotal, 'currency')"
+            class="sf-property--full-width property"
+          />
+          <SfProperty
+            v-if="taxPrice"
+            :name="$t('components.checkout.cart_preview.tax')"
+            :value="$n(taxPrice, 'currency')"
             class="sf-property--full-width property"
           />
         </div>
@@ -57,7 +57,7 @@
         <SfDivider />
 
         <SfProperty
-          name="Total price"
+          :name="$t('components.checkout.cart_preview.total')"
           :value="$n(totals.total, 'currency')"
           class="sf-property--full-width sf-property--large summary__property-total"
         />
@@ -169,6 +169,7 @@ export default {
       loading,
       products: computed(() => cartGetters.getItems(cart.value)),
       totals: computed(() => cartGetters.getTotals(cart.value)),
+      taxPrice: computed(() => cart.value?.taxTotalAmount || 0),
       cartGetters,
       processOrder,
       handlePaymentChange

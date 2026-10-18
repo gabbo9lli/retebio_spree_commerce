@@ -21,8 +21,7 @@
               subtitle="Freschezza e genuinità certificata"
               button-text="Scopri la Frutta"
               :link="localePath('/c/categoria/frutta')"
-              image="/homepage/bannerA.webp"
-              class="sf-banner--slim"
+              class="sf-banner--slim home-banner-frutta"
             />
           </div>
           <div class="grid__col">
@@ -31,8 +30,7 @@
               subtitle="Coltivata con passione nei nostri campi"
               button-text="Scopri la Verdura"
               :link="localePath('/c/categoria/verdura')"
-              image="/homepage/bannerB.webp"
-              class="sf-banner--slim"
+              class="sf-banner--slim home-banner-verdura"
             />
           </div>
         </div>
@@ -141,7 +139,7 @@
       <LazyHydrate when-visible>
         <div class="similar-products">
           <SfHeading :title="$t('pages.home.similar_products_heading')" :level="2"/>
-          <nuxt-link :to="localePath('/c/categories/women')" class="smartphone-only">
+          <nuxt-link :to="localePath('/c/categoria')" class="smartphone-only">
             {{ $t('pages.home.see_all') }}
           </nuxt-link>
         </div>
@@ -188,7 +186,6 @@
           :title="$t('pages.home.cta_subscribe_title')"
           :button-text="$t('pages.home.cta_subscribe_button_label')"
           :description="$t('pages.home.cta_subscribe_description')"
-          image="/homepage/newsletter.webp"
           class="call-to-action"
         >
           <template #button>
@@ -398,8 +395,27 @@ export default {
   }
 }
 
+.home-banner-frutta {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%) !important;
+  border: 1px solid #ffe082;
+  border-radius: 8px;
+  --banner-title-color: #e65100;
+  --banner-subtitle-color: #bf360c;
+}
+
+.home-banner-verdura {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
+  border: 1px solid #a5d6a7;
+  border-radius: 8px;
+  --banner-title-color: #1b5e20;
+  --banner-subtitle-color: #2e7d32;
+}
+
 .call-to-action {
-  background-position: right;
+  background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%) !important;
+  border-radius: 8px;
+  --call-to-action-color: #ffffff;
+  --call-to-action-title-color: #ffffff;
   margin: var(--spacer-xs) 0;
   @include for-desktop {
     margin: var(--spacer-xl) 0 0 0;

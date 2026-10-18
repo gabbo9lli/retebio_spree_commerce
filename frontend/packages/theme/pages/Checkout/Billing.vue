@@ -288,6 +288,9 @@ export default {
       if (checkoutBillingAddress.value && savedAddresses.value?.addresses) {
         selectedSavedAddressId.value = savedAddresses.value.addresses.find(e => isEqualAddress(e, checkoutBillingAddress.value))?._id;
       }
+      if (!selectedSavedAddressId.value && savedAddresses.value?.addresses?.length) {
+        selectedSavedAddressId.value = savedAddresses.value.addresses[0]._id;
+      }
     };
 
     onMounted(async () => {

@@ -132,15 +132,6 @@
               @click:wishlist="handleWishlistClick(product)"
               @click:add-to-cart="handleAddToCart(product)"
             >
-              <template #configuration>
-                <SfProperty
-                  class="desktop-only"
-                  name="Size"
-                  value="XS"
-                  style="margin: 0 0 1rem 0;"
-                />
-                <SfProperty class="desktop-only" name="Color" value="white" />
-              </template>
               <template #actions>
                 <SfButton
                   v-if="!isInWishlist({ product })"

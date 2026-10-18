@@ -27,7 +27,7 @@
               <span :class="getStatusTextClass(order)">{{ orderGetters.getStatus(order) }}</span>
             </SfTableData>
             <SfTableData class="orders__view orders__element--right">
-              <SfButton class="sf-button--text desktop-only" @click="displayOrderDetails(order)">
+              <SfButton class="sf-button--text" @click="displayOrderDetails(order)">
                 {{ $t('pages.my_account.order_history.view_details') }}
               </SfButton>
             </SfTableData>

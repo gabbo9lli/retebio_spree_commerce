@@ -1,21 +1,15 @@
 <template>
   <div id="thank-you">
-    <SfCallToAction
+    <div
       v-e2e="'thank-you-banner'"
       class="banner"
-      :title="$t('pages.checkout.thank_you.thank_you_banner_title')"
-      :image="{
-        mobile: '/thankyou/bannerM.png',
-        desktop: '/thankyou/bannerD.png',
-      }"
     >
-      <template #description>
-        <div class="banner__order-number">
-          <span>{{ $t('pages.checkout.thank_you.order_no') }}</span>
-          <strong>{{ orderNumber }}</strong>
-        </div>
-      </template>
-    </SfCallToAction>
+      <h2 class="banner__title">{{ $t('pages.checkout.thank_you.thank_you_banner_title') }}</h2>
+      <div class="banner__order-number">
+        <span>{{ $t('pages.checkout.thank_you.order_no') }}</span>
+        <strong>{{ orderNumber }}</strong>
+      </div>
+    </div>
     <section class="section">
       <div class="order">
         <SfHeading
@@ -70,36 +64,46 @@
         </div>
       </div>
     </section>
-    <SfButton class="back-button color-secondary button-size"
-      >{{ $t('pages.checkout.thank_you.go_back_to_shop') }}</SfButton
+    <SfButton
+      class="back-button color-primary button-size"
+      @click="navigateToShop"
     >
+      {{ $t('pages.checkout.thank_you.go_back_to_shop') }}
+    </SfButton>
   </div>
 </template>
 
 <script>
-import { SfHeading, SfButton, SfCallToAction } from '@storefront-ui/vue';
-import { ref } from '@nuxtjs/composition-api';
+import { SfHeading, SfButton } from '@storefront-ui/vue';
+import { computed, useRoute, useRouter } from '@nuxtjs/composition-api';
 
 export default {
   components: {
     SfHeading,
-    SfButton,
-    SfCallToAction
+    SfButton
   },
   setup(props, context) {
     context.emit('changeStep', 4);
+    const route = useRoute();
+    const router = useRouter();
 
-    const companyDetails = ref({
-      name: 'Divante Headquarter',
-      street: 'St. Dmowskiego 17, 53-534',
-      city: 'Wroclaw, Poland',
-      email: 'demo@vuestorefront.io'
-    });
-    const orderNumber = ref('80932031-030-00');
+    const companyDetails = {
+      name: 'ReteBio Consorzio',
+      street: 'Strada Gazzaro 17',
+      city: '42024 Castelnovo di Sotto (RE)',
+      email: 'info@retebio.it'
+    };
+
+    const orderNumber = computed(() => route?.value?.query?.order || '');
+
+    const navigateToShop = () => {
+      router.push(context.root.localePath('/'));
+    };
 
     return {
       companyDetails,
-      orderNumber
+      orderNumber,
+      navigateToShop
     };
   }
 };
@@ -113,39 +117,31 @@ export default {
     margin: 0 auto;
   }
 }
-.heading {
-  --heading-padding: var(--spacer-base) 0;
-  @include for-desktop {
-    --heading-padding: var(--spacer-sm) 0 var(--spacer-xs) 0;
-  }
-}
-.paragraph {
-  margin: 0;
-  color: var(--c-link);
-  font: var(--font-weight--normal) var(--font-size--base) / 1.6
-    var(--font-family--primary);
-  @include for-desktop {
-    font-weight: var(--font-weight--light);
-    font-size: var(--font-size--sm);
-    margin-bottom: var(--spacer-lg);
-  }
-}
 .banner {
-  --call-to-action-color: var(--c-text);
-  --call-to-action-title-font-size: var(--h2-font-size);
-  --call-to-action-title-font-weight: var(--font-weight--semibold);
-  --call-to-action-text-container-width: 50%;
-  @include for-desktop {
-    margin: 0 0 var(--spacer-2xl) 0;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
+  border-radius: 8px;
+  border: 1px solid #a5d6a7;
+  padding: 2.5rem 2rem;
+  margin: 0 0 var(--spacer-xl) 0;
+
+  &__title {
+    color: #1b5e20;
+    font-size: var(--h2-font-size);
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
   }
+
   &__order-number {
     display: flex;
-    flex-direction: column;
-    font: var(--font-weight--light) var(--font-size--sm) / 1.4
-      var(--font-family--primary);
-    @include for-desktop {
-      flex-direction: row;
-      font-size: var(--font-size--normal);
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.15rem;
+    color: #2e7d32;
+
+    strong {
+      font-size: 1.35rem;
+      color: #1b5e20;
+      letter-spacing: 0.05em;
     }
   }
 }

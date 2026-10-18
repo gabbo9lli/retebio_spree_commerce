@@ -17,7 +17,7 @@
         <HeaderNavigation />
       </template>
       <template #aside>
-        <LocaleSelector class="smartphone-only" />
+        <LocaleSelector />
       </template>
       <template #header-icons>
         <div v-e2e="'header-icons'" class="sf-header__icons">

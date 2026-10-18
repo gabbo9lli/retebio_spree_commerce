@@ -4,11 +4,12 @@
       <SfAccordion open="" :multiple="false" transition="" showChevron>
         <template v-for="(cat, i) in menu && menu.items">
           <SfMenuItem
-            v-if="isExternalLink(cat)"
+            v-if="isExternalLink(cat) || !cat.items || !cat.items.length"
             :key="i"
             :label="cat.name || cat.label"
             class="sf-accordion-item__header"
-            :link="cat.link"
+            :link="isExternalLink(cat) ? cat.link : getRoute(cat)"
+            @click.native="toggleMobileMenu"
           />
           <SfAccordionItem
             v-else

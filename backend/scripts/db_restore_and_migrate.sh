@@ -176,6 +176,7 @@ test_client.save!
 Spree::RoleUser.find_or_create_by!(role: user_role, user: test_client)
 
 if it_country
+  re_state = Spree::State.find_by(abbr: 'RE') || Spree::State.find_by(name: 'Reggio Emilia') || (it_country.states.first if it_country.respond_to?(:states))
   test_addr = {
     firstname: 'Cliente',
     lastname: 'Test',
@@ -185,17 +186,28 @@ if it_country
     zipcode: '42121',
     phone: '3331234567',
     country: it_country,
-    state: re_state
+    state: re_state,
+    user: test_client
   }
   b = test_client.bill_address || test_client.build_bill_address
   b.assign_attributes(test_addr)
+  b.user = test_client
   b.save!
   s = test_client.ship_address || test_client.build_ship_address
   s.assign_attributes(test_addr)
+  s.user = test_client
   s.save!
   test_client.bill_address = b
   test_client.ship_address = s
   test_client.save!
+end
+
+# Assicura user_id sugli indirizzi di default di tutti i clienti
+Spree.user_class.where.not(bill_address_id: nil).find_each do |u|
+  Spree::Address.where(id: u.bill_address_id, user_id: nil).update_all(user_id: u.id)
+end
+Spree.user_class.where.not(ship_address_id: nil).find_each do |u|
+  Spree::Address.where(id: u.ship_address_id, user_id: nil).update_all(user_id: u.id)
 end
 puts \"Account test B2B pronto: cliente@retebio.it / password123 (ID: #{test_client.id})\"
 

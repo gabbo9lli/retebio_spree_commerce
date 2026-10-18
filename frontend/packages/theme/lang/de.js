@@ -64,10 +64,8 @@ export default {
         make_an_order: 'Eine Bestellung aufgeben',
         table_headers: [
           { key: 'description', value: 'Beschreibung' },
-          { key: 'size', value: 'Größe' },
-          { key: 'color', value: 'Farbe' },
           { key: 'quantity', value: 'Menge' },
-          { key: 'amount', value: 'Menge' }
+          { key: 'amount', value: 'Preis' }
         ]
       },
       shipping: {
@@ -268,12 +266,12 @@ export default {
         items: ['Wer wir sind', 'Qualität im Detail', 'Kundenbewertungen']
       },
       departments: {
-        title: 'Abteilungen',
-        items: ['Damenmode', 'Herrenmode', 'Kinderkleidung', 'Heim']
+        title: 'Unsere Produkte',
+        items: ['Bio-Obst', 'Bio-Gemüse', 'Mehl und Getreide', 'Hülsenfrüchte', 'Honig und Konfitüren', 'Öl und Essig']
       },
       help: {
-        title: 'Hilfe',
-        items: ['Kundendienst', 'Größentabelle', 'Kontaktiere uns']
+        title: 'Hilfe & Kontakt',
+        items: ['Kundendienst', 'Kontaktiere uns']
       },
       payment_and_delivery: {
         title: 'Zahlung & Lieferung',

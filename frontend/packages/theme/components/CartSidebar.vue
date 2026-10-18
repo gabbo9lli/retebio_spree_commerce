@@ -95,12 +95,33 @@
           <div v-if="totalItems">
             <SfProperty
               :name="$t('components.cart_sidebar.subtotal_price')"
-              class="sf-property--full-width sf-property--large my-cart__total-price"
+              class="sf-property--full-width sf-property--large property"
             >
               <template #value>
                 <SfPrice
                   :regular="$n(totals.subtotal, 'currency')"
                   :special="(totals.special !== totals.subtotal) ? $n(totals.special, 'currency') : 0"
+                />
+              </template>
+            </SfProperty>
+            <SfProperty
+              v-if="taxPrice"
+              :name="$t('components.cart_sidebar.tax_price')"
+              class="sf-property--full-width sf-property--large property"
+            >
+              <template #value>
+                <SfPrice
+                  :regular="$n(taxPrice, 'currency')"
+                />
+              </template>
+            </SfProperty>
+            <SfProperty
+              :name="$t('components.cart_sidebar.total_price')"
+              class="sf-property--full-width sf-property--large my-cart__total-price"
+            >
+              <template #value>
+                <SfPrice
+                  :regular="$n(totals.total, 'currency')"
                 />
               </template>
             </SfProperty>
@@ -162,6 +183,7 @@ export default {
     const products = computed(() => cartGetters.getItems(cart.value));
     const totals = computed(() => cartGetters.getTotals(cart.value));
     const totalItems = computed(() => cartGetters.getTotalItems(cart.value));
+    const taxPrice = computed(() => cart.value?.taxTotalAmount || 0);
     const { wishlist, addItem: addItemToWishlist, isInWishlist } = useWishlist();
     const isWishlistDisabled = computed(() => wishlistGetters.isWishlistDisabled(wishlist.value));
     const updateQuantity = debounce(async ({ product, quantity }) => {
@@ -183,6 +205,7 @@ export default {
       toggleCartSidebar,
       totals,
       totalItems,
+      taxPrice,
       cartGetters,
       handleSaveForLaterClick,
       isWishlistDisabled,

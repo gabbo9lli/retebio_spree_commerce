@@ -34,37 +34,6 @@
           </div>
         </div>
         <div>
-          <SfSelect
-            v-e2e="'size-select'"
-            v-if="options.size"
-            :value="configuration.size"
-            @input="size => updateFilter({ size })"
-            :label="$t('pages.product.size_select_label')"
-            class="sf-select--underlined product__select-size"
-            :required="true"
-          >
-            <SfSelectOption
-              v-for="size in options.size"
-              :key="size.value"
-              :value="size.value"
-            >
-              {{size.value}}
-            </SfSelectOption>
-          </SfSelect>
-          <SfButton v-if="options.size" class="sf-button--text desktop-only product__guide">
-            {{ $t('pages.product.button_size_guide_label') }}
-          </SfButton>
-          <div v-if="options.color && options.color.length > 1" class="product__colors desktop-only">
-            <p class="product__color-label">{{ $t('pages.product.color_label') }}:</p>
-            <SfColor
-              v-for="(color, i) in options.color"
-              :key="i"
-              :color="color.value"
-              :selected="color.value === configuration.color"
-              class="product__color"
-              @click="updateFilter({ color: color.value })"
-            />
-          </div>
           <div v-if="product" class="product__order-box my-3 p-3 rounded" style="background-color: #f9fbf9; border: 1px solid #c8e6c9; border-radius: 8px; padding: 16px;">
             <div class="product__package-badge mb-3 d-flex align-items-center justify-content-between" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <span style="font-weight: 700; color: #2e7d32; font-size: 1.05rem;">
@@ -416,36 +385,8 @@ export default {
     padding: 0;
     margin: 0;
   }
-  &__select-size {
-    margin: 0 var(--spacer-sm);
-    @include for-desktop {
-      margin: 0;
-    }
-  }
-  &__colors {
-    @include font(
-      --product-color-font,
-      var(--font-weight--normal),
-      var(--font-size--lg),
-      1.6,
-      var(--font-family--secondary)
-    );
-    display: flex;
-    align-items: center;
-    margin-top: var(--spacer-sm);
-  }
-  &__color-label {
-    margin: 0 var(--spacer-sm) 0 0;
-  }
-  &__color {
-    margin: 0 var(--spacer-2xs);
-  }
   &__add-to-cart {
     margin: var(--spacer-2xl) 0 var(--spacer-sm);
-  }
-  &__guide{
-    display: block;
-    margin: 0 0 var(--spacer-sm) auto;
   }
   &__compare,
   &__save {

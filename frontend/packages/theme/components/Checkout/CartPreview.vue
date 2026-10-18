@@ -37,6 +37,12 @@
         class="sf-property--full-width sf-property--large property"
       />
       <SfProperty
+        :name="$t('components.checkout.cart_preview.tax')"
+        v-if="taxPrice"
+        :value="$n(taxPrice, 'currency')"
+        class="sf-property--full-width sf-property--large property"
+      />
+      <SfProperty
         :name="$t('components.checkout.cart_preview.total')"
         :value="$n(totals.total, 'currency')"
         class="sf-property--full-width sf-property--large property-total"
@@ -102,6 +108,7 @@ export default {
     const totals = computed(() => cartGetters.getTotals(cart.value));
     const discounts = computed(() => cartGetters.getDiscounts(cart.value));
     const shippingPrice = computed(() => cartGetters.getShippingPrice(cart.value));
+    const taxPrice = computed(() => cart.value?.taxTotalAmount || 0);
 
     return {
       discounts,
@@ -110,6 +117,7 @@ export default {
       products,
       totals,
       shippingPrice,
+      taxPrice,
       promoCode,
       showPromoCode,
       removeItem,

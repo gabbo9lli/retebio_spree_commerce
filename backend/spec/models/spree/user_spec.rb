@@ -66,4 +66,25 @@ RSpec.describe Spree::User, type: :model do
       end
     end
   end
+
+  describe 'address synchronization' do
+    let(:country) { Spree::Country.find_by(iso: 'IT') || create(:country, iso: 'IT') }
+    let(:user) { described_class.create!(email: 'addr_test@example.com', password: 'password123', password_confirmation: 'password123') }
+
+    it 'automatically assigns user_id to bill_address and ship_address on save' do
+      addr1 = Spree::Address.create!(firstname: 'Mario', lastname: 'Rossi', address1: 'Via 1', city: 'RE', zipcode: '42121', phone: '123456789', country: country)
+      addr2 = Spree::Address.create!(firstname: 'Luigi', lastname: 'Verdi', address1: 'Via 2', city: 'RE', zipcode: '42121', phone: '123456789', country: country)
+
+      expect(addr1.user_id).to be_nil
+      expect(addr2.user_id).to be_nil
+
+      user.bill_address = addr1
+      user.ship_address = addr2
+      user.save!
+
+      expect(addr1.reload.user_id).to eq(user.id)
+      expect(addr2.reload.user_id).to eq(user.id)
+      expect(user.addresses).to include(addr1, addr2)
+    end
+  end
 end
